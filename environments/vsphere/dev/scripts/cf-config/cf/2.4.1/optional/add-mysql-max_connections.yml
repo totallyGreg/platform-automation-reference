@@ -1,4 +1,0 @@
-- type: replace
-  path: /product-properties/.mysql.max_connections?
-  value:
-    value: ((mysql/max_connections))
