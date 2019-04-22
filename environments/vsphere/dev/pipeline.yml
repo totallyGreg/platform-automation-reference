@@ -42,7 +42,7 @@ resources:
 - name: configuration
   type: git
   source:
-    uri: git@github.com:calebwashburn/platform-automation-example.git
+    uri: git@github.com:calebwashburn/platform-automation-reference.git
     private_key: {{git_private_key}}
 
 jobs:
@@ -411,44 +411,22 @@ jobs:
       VARS_FILES: vars/((foundation))/config/vars/cf.yml
       ENV_FILE: ((foundation))/config/templates/env.yml
 
-- name: apply-product-changes
-  serial: true
-  plan:
-  - aggregate:
-    - get: configuration
-      trigger: true
-      passed: [ pas ]
-      params:
-        unpack: true
-    - get: pcf-automation-image
-      resource: pcf-automation
-      params:
-        unpack: true
-        globs: ["*image*"]
-    - get: pcf-automation-tasks
-      resource: pcf-automation
-      params:
-        unpack: true
-        globs: ["*tasks*"]
-    - get: pcf-automation-image-fixes
-  - task: credhub-interpolate
-    image: pcf-automation-image-fixes
-    file: configuration/fixes/tasks/credhub-interpolate.yml
-    params:
-      CREDHUB_CLIENT: ((credhub-client))
-      CREDHUB_SECRET: ((credhub-secret))
-      CREDHUB_SERVER: ((credhub-server))
-      CREDHUB_CA_CERT: ((credhub-ca))
-      PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "((foundation))/config"
-    input_mapping:
-      files: configuration
-    output_mapping:
-      interpolated-files: configuration
-      
   - task: apply-product-changes
     image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/apply-changes.yml
+    config:
+      platform: linux
+      inputs:
+      - name: env
+      params:
+        ENV_FILE: ((foundation))/config/templates/env.yml
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          cat /var/version && echo ""
+          set -eux
+          om --env env/"${ENV_FILE}" apply-changes --product-name cf
     input_mapping:
       env: configuration
     params:
