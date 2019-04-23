@@ -84,7 +84,7 @@ jobs:
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
     input_mapping:
       files: configuration
   - task: download-opsman-image
@@ -181,7 +181,7 @@ jobs:
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
     input_mapping:
       files: configuration
   - task: export-installation
@@ -242,7 +242,7 @@ jobs:
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
     input_mapping:
       files: configuration
   - task: remove-timestamp
@@ -332,7 +332,7 @@ jobs:
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
     input_mapping:
       files: configuration
   - task: download-cf
