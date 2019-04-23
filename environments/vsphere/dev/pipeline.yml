@@ -168,7 +168,7 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
   - put: installation
     params:
-      file: installation/*-installation.zip
+      file: installation/installation-*.zip
 
 - name: upgrade-opsman
   serial: true
