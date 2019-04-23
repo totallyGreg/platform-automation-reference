@@ -93,7 +93,7 @@ jobs:
     input_mapping:
       config: interpolated-files
     params:
-      CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
+      CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
   - task: create-vm
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/create-vm.yml
@@ -102,10 +102,11 @@ jobs:
       state: timestamp-state
       config: configuration
       vars: configuration
+      secrets: interpolated-files
     params:
       STATE_FILE: state/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
-      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
+      VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/((foundation))/config/secrets/templates/opsman.yml
   - task: add-timestamp
     image: pcf-automation-image
     config:
@@ -132,25 +133,27 @@ jobs:
       env: interpolated-files
       config: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
-      AUTH_CONFIG_FILE: environments/((foundation))/config/templates/auth.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      AUTH_CONFIG_FILE: environments/((foundation))/config/secrets/templates/auth.yml
   - task: configure-director
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/configure-director.yml
     input_mapping:
       config: configuration
       env: interpolated-files
+      vars: configuration
+      secrets: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       DIRECTOR_CONFIG_FILE: environments/((foundation))/config/templates/director.yml
-      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/director.yml
+      VARS_FILES: vars/environments/((foundation))/config/vars/director.yml secrets/((foundation))/config/secrets/templates/director.yml
   - task: apply-director-changes
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/apply-director-changes.yml
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
 - name: export-installation
   serial: true
@@ -190,7 +193,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
   - task: add-timestamp
     image: pcf-automation-image
     config:
@@ -268,7 +271,7 @@ jobs:
     input_mapping:
       config: interpolated-files
     params:
-      CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
+      CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
   - task: upgrade-opsman
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/upgrade-opsman.yml
@@ -280,7 +283,7 @@ jobs:
       installation: timestamp-installation
       vars: configuration
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
       VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
       STATE_FILE: state.yml
@@ -341,7 +344,7 @@ jobs:
     input_mapping:
       config: interpolated-files
     params:
-      CONFIG_FILE: environments/((foundation))/config/versions/cf.yml
+      CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf.yml
 
   - task: upload-product
     image: pcf-automation-image
@@ -350,7 +353,7 @@ jobs:
       product: downloaded-product
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: stage-product
     image: pcf-automation-image
@@ -359,7 +362,7 @@ jobs:
       product: downloaded-product
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: upload-pas-stemcell
     image: pcf-automation-image
@@ -368,7 +371,7 @@ jobs:
       env: interpolated-files
       stemcell: downloaded-stemcell
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: assign-stemcell
     image: pcf-automation-image
@@ -377,7 +380,7 @@ jobs:
       env: interpolated-files
       config: assign-stemcell-config
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: configure-pas
     image: pcf-automation-image
@@ -390,7 +393,7 @@ jobs:
     params:
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
       VARS_FILES: vars/((foundation))/config/vars/cf.yml
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: apply-product-changes
     image: pcf-automation-image
@@ -399,7 +402,7 @@ jobs:
       inputs:
       - name: env
       params:
-        ENV_FILE: environments/((foundation))/config/templates/env.yml
+        ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       run:
         path: /bin/bash
         args:
@@ -411,4 +414,4 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
