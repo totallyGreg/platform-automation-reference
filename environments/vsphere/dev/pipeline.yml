@@ -39,6 +39,7 @@ resources:
   source:
     uri: git@github.com:calebwashburn/platform-automation-reference.git
     private_key: {{git_private_key}}
+    paths: ["environments/((foundation))"]
 
 jobs:
 - name: install-opsman
@@ -78,7 +79,7 @@ jobs:
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
-    params:
+    params: &credhub_interpolate_params
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
       CREDHUB_SERVER: ((credhub-server))
@@ -178,13 +179,7 @@ jobs:
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
-    params:
-      CREDHUB_CLIENT: ((credhub-client))
-      CREDHUB_SECRET: ((credhub-secret))
-      CREDHUB_SERVER: ((credhub-server))
-      CREDHUB_CA_CERT: ((credhub-ca))
-      PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
+    params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: export-installation
@@ -239,13 +234,7 @@ jobs:
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
-    params:
-      CREDHUB_CLIENT: ((credhub-client))
-      CREDHUB_SECRET: ((credhub-secret))
-      CREDHUB_SERVER: ((credhub-server))
-      CREDHUB_CA_CERT: ((credhub-ca))
-      PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
+    params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: remove-timestamp
@@ -329,13 +318,7 @@ jobs:
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
-    params:
-      CREDHUB_CLIENT: ((credhub-client))
-      CREDHUB_SECRET: ((credhub-secret))
-      CREDHUB_SERVER: ((credhub-server))
-      CREDHUB_CA_CERT: ((credhub-ca))
-      PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "environments/((foundation))/config/secrets"
+    params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: download-cf
