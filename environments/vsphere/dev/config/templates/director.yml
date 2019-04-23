@@ -1,25 +1,26 @@
-iaas-configuration:
-  vcenter_host: ((vcenter_hostname))
-  vcenter_username: ((vcenter_userid))
-  vcenter_password: ((vcenter_password))
-  datacenter: ((vsphere_datacenter))
-  ssl_verification_enabled: false
-  disk_type: thin
-  ephemeral_datastores_string: ((vsphere_datastore))
-  persistent_datastores_string: ((vsphere_datastore))
-  bosh_vm_folder: ((vsphere_vms_folder))
-  bosh_template_folder: ((vsphere_templates_folder))
-  bosh_disk_path: ((vsphere_disks_folder))
-  nsx_networking_enabled: true
-  nsx_mode: nsx-t
-  nsx_address: ((nsx_hostname))
-  nsx_username: ((nsx_admin_user))
-  nsx_password: ((nsx_admin_password))
-  nsx_ca_certificate: ((nsx_ca_cert))
-director-configuration:
-  ntp_servers_string: ((ntp))
-  resurrector_enabled: true
-  post_deploy_enabled: false
+properties-configuration:
+  iaas_configuration:
+    vcenter_host: ((vcenter_hostname))
+    vcenter_username: ((vcenter_userid))
+    vcenter_password: ((vcenter_password))
+    datacenter: ((vsphere_datacenter))
+    ssl_verification_enabled: false
+    disk_type: thin
+    ephemeral_datastores_string: ((vsphere_datastore))
+    persistent_datastores_string: ((vsphere_datastore))
+    bosh_vm_folder: ((vsphere_vms_folder))
+    bosh_template_folder: ((vsphere_templates_folder))
+    bosh_disk_path: ((vsphere_disks_folder))
+    nsx_networking_enabled: true
+    nsx_mode: nsx-t
+    nsx_address: ((nsx_hostname))
+    nsx_username: ((nsx_admin_user))
+    nsx_password: ((nsx_admin_password))
+    nsx_ca_certificate: ((nsx_ca_cert))
+  director_configuration:
+    ntp_servers_string: ((ntp))
+    resurrector_enabled: true
+    post_deploy_enabled: false
 az-configuration:
 - name: AZ1
   clusters:
