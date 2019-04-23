@@ -283,15 +283,6 @@ jobs:
     params:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
-  - task: assign-stemcell
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/upload-stemcell.yml
-    input_mapping:
-      env: interpolated-files
-      config: assign-stemcell-config
-    params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
-
   - task: configure-pas
     image: platform-automation-image
     file: platform-automation-tasks/tasks/configure-product.yml
@@ -302,7 +293,7 @@ jobs:
       secrets: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
-      VARS_FILES: vars/((foundation))/config/vars/cf.yml
+      VARS_FILES: vars/environments/((foundation))/config/defaults/cf.yml vars/environments/((foundation))/config/vars/cf.yml secrets/environments/((foundation))/config/secrets/templates/cf.yml
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: apply-product-changes
