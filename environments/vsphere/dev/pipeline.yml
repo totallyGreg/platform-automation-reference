@@ -19,18 +19,7 @@ resources:
     bucket: state
     region_name: us-east-1
     secret_access_key: {{secret_key}}
-    regexp: ((foundation))/(.*)-installation.zip
-    skip_ssl_verification: true
-    endpoint: {{s3_endpoint}}
-
-- name: state
-  type: s3
-  source:
-    access_key_id: {{access_key}}
-    bucket: state
-    region_name: us-east-1
-    secret_access_key: {{secret_key}}
-    regexp: ((foundation))/(.*)-state.yml
+    regexp: ((foundation))/installation-(.*).zip
     skip_ssl_verification: true
     endpoint: {{s3_endpoint}}
 
@@ -39,7 +28,7 @@ resources:
   source:
     uri: git@github.com:calebwashburn/platform-automation-reference.git
     private_key: {{git_private_key}}
-    paths: ["environments/((foundation))"]
+    paths: ["environments/((foundation))/config"]
 
 jobs:
 - name: install-opsman
@@ -61,21 +50,6 @@ jobs:
       params:
         unpack: true
         globs: ["*tasks*"]
-    - get: state
-  - task: remove-timestamp
-    image: pcf-automation-image
-    config:
-      platform: linux
-      inputs:
-      - name: state
-      outputs:
-      - name: timestamp-state
-      run:
-        path: /bin/bash
-        args:
-        - -c
-        - |
-          mv state/*state.yml timestamp-state/state.yml
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
@@ -100,32 +74,34 @@ jobs:
     file: pcf-automation-tasks/tasks/create-vm.yml
     input_mapping:
       image: downloaded-product
-      state: timestamp-state
+      state: configuration
       config: configuration
       vars: configuration
       secrets: interpolated-files
     params:
-      STATE_FILE: state/state.yml
+      STATE_FILE: environments/((foundation))/state/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
-  - task: add-timestamp
-    image: pcf-automation-image
-    config:
-      platform: linux
-      inputs:
-      - name: generated-state
-      outputs:
-      - name: timestamp-state
-      run:
-        path: /bin/bash
-        args:
-        - -c
-        - |
-          ts=$(date +"%Y%m%M%S%N")
-          mv generated-state/state.yml timestamp-state/${ts}-state.yml
-  - put: state
-    params:
-      file: timestamp-state/*-state.yml
+    ensure: &make-state-commit
+      do:
+        - task: make-commit
+          image: platform-automation-image
+          file: platform-automation-tasks/tasks/make-git-commit.yml
+          input_mapping:
+            repository: configuration
+            file-source: generated-state
+          output_mapping:
+            repository-commit: configuration-commit
+          params:
+            FILE_SOURCE_PATH: state.yml
+            FILE_DESTINATION_PATH: environments/((foundation))/state/state.yml
+            GIT_AUTHOR_EMAIL: "cwashburn@pivotal.io"
+            GIT_AUTHOR_NAME: "Platform Automation"
+            COMMIT_MESSAGE: 'Update state file'
+        - put: configuration
+          params:
+            repository: configuration-commit
+            merge: true
   - task: configure-authentication
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/configure-authentication.yml
@@ -189,24 +165,9 @@ jobs:
       env: interpolated-files
     params:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
-  - task: add-timestamp
-    image: pcf-automation-image
-    config:
-      platform: linux
-      inputs:
-      - name: installation
-      outputs:
-      - name: timestamp-installation
-      run:
-        path: /bin/bash
-        args:
-        - -c
-        - |
-          ts=$(date +"%Y%m%M%S%N")
-          mv installation/installation.zip timestamp-installation/${ts}-installation.zip
   - put: installation
     params:
-      file: timestamp-installation/*-installation.zip
+      file: installation/*-installation.zip
 
 - name: upgrade-opsman
   serial: true
@@ -230,30 +191,12 @@ jobs:
         globs: ["*tasks*"]
     - get: installation
       passed: [ export-installation ]
-    - get: state
   - task: credhub-interpolate
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/credhub-interpolate.yml
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
-  - task: remove-timestamp
-    image: pcf-automation-image
-    config:
-      platform: linux
-      inputs:
-      - name: state
-      - name: installation
-      outputs:
-      - name: timestamp-state
-      - name: timestamp-installation
-      run:
-        path: /bin/bash
-        args:
-        - -c
-        - |
-          mv state/*state.yml timestamp-state/state.yml
-          mv installation/*installation.zip timestamp-installation/installation.zip
   - task: download-opsman-image
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/download-product.yml
@@ -266,35 +209,37 @@ jobs:
     file: pcf-automation-tasks/tasks/upgrade-opsman.yml
     input_mapping:
       image: downloaded-product
-      state: timestamp-state
+      state: configuration
       config: configuration
       env: interpolated-files
-      installation: timestamp-installation
+      installation: installation
       vars: configuration
+      secrets: interpolated-files
     params:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
-      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
-      STATE_FILE: state.yml
-  - task: add-timestamp
-    image: pcf-automation-image
-    config:
-      platform: linux
-      inputs:
-      - name: generated-state
-      outputs:
-      - name: timestamp-state
-      run:
-        path: /bin/bash
-        args:
-        - -c
-        - |
-          ts=$(date +"%Y%m%M%S%N")
-          mv generated-state/state.yml timestamp-state/${ts}-state.yml
-  - put: state
-    params:
-      file: timestamp-state/*-state.yml
-
+      VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
+      STATE_FILE: environments/((foundation))/state/state.yml
+    ensure: &make-state-commit
+      do:
+        - task: make-commit
+          image: platform-automation-image
+          file: platform-automation-tasks/tasks/make-git-commit.yml
+          input_mapping:
+            repository: configuration
+            file-source: generated-state
+          output_mapping:
+            repository-commit: configuration-commit
+          params:
+            FILE_SOURCE_PATH: state.yml
+            FILE_DESTINATION_PATH: environments/((foundation))/state/state.yml
+            GIT_AUTHOR_EMAIL: "cwashburn@pivotal.io"
+            GIT_AUTHOR_NAME: "Platform Automation"
+            COMMIT_MESSAGE: 'Update state file'
+        - put: configuration
+          params:
+            repository: configuration-commit
+            merge: true
 - name: pas
   serial: true
   plan:
