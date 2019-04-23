@@ -6,7 +6,7 @@ resource_types:
     tags: latest-final
 
 resources:
-- name: pcf-automation
+- name: platform-automation
   type: pivnet
   source:
     api_token: {{pivnet_token}}
@@ -40,19 +40,19 @@ jobs:
       trigger: true
       params:
         unpack: true
-    - get: pcf-automation-image
-      resource: pcf-automation
+    - get: platform-automation-image
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*image*"]
-    - get: pcf-automation-tasks
-      resource: pcf-automation
+    - get: platform-automation-tasks
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*tasks*"]
   - task: credhub-interpolate
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
     params: &credhub_interpolate_params
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
@@ -63,15 +63,15 @@ jobs:
     input_mapping:
       files: configuration
   - task: download-opsman-image
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/download-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/download-product.yml
     input_mapping:
       config: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
   - task: create-vm
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/create-vm.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/create-vm.yml
     input_mapping:
       image: downloaded-product
       state: configuration
@@ -103,8 +103,8 @@ jobs:
             repository: configuration-commit
             merge: true
   - task: configure-authentication
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/configure-authentication.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/configure-authentication.yml
     attempts: 20
     input_mapping:
       env: interpolated-files
@@ -113,8 +113,8 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       AUTH_CONFIG_FILE: environments/((foundation))/config/secrets/templates/auth.yml
   - task: configure-director
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/configure-director.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/configure-director.yml
     input_mapping:
       config: configuration
       env: interpolated-files
@@ -125,8 +125,8 @@ jobs:
       DIRECTOR_CONFIG_FILE: environments/((foundation))/config/templates/director.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/director.yml secrets/environments/((foundation))/config/secrets/templates/director.yml
   - task: apply-director-changes
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/apply-director-changes.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/apply-director-changes.yml
     input_mapping:
       env: interpolated-files
     params:
@@ -142,25 +142,25 @@ jobs:
       passed: [ install-opsman ]
       params:
         unpack: true
-    - get: pcf-automation-image
-      resource: pcf-automation
+    - get: platform-automation-image
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*image*"]
-    - get: pcf-automation-tasks
-      resource: pcf-automation
+    - get: platform-automation-tasks
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*tasks*"]
   - task: credhub-interpolate
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: export-installation
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/export-installation.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/export-installation.yml
     input_mapping:
       env: interpolated-files
     params:
@@ -179,34 +179,34 @@ jobs:
       passed: [ export-installation ]
       params:
         unpack: true
-    - get: pcf-automation-image
-      resource: pcf-automation
+    - get: platform-automation-image
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*image*"]
-    - get: pcf-automation-tasks
-      resource: pcf-automation
+    - get: platform-automation-tasks
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*tasks*"]
     - get: installation
       passed: [ export-installation ]
   - task: credhub-interpolate
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: download-opsman-image
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/download-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/download-product.yml
     input_mapping:
       config: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
   - task: upgrade-opsman
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/upgrade-opsman.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upgrade-opsman.yml
     input_mapping:
       image: downloaded-product
       state: configuration
@@ -220,26 +220,7 @@ jobs:
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
       STATE_FILE: environments/((foundation))/state/state.yml
-    ensure: &make-state-commit
-      do:
-        - task: make-commit
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/make-git-commit.yml
-          input_mapping:
-            repository: configuration
-            file-source: generated-state
-          output_mapping:
-            repository-commit: configuration-commit
-          params:
-            FILE_SOURCE_PATH: state.yml
-            FILE_DESTINATION_PATH: environments/((foundation))/state/state.yml
-            GIT_AUTHOR_EMAIL: "cwashburn@pivotal.io"
-            GIT_AUTHOR_NAME: "Platform Automation"
-            COMMIT_MESSAGE: 'Update state file'
-        - put: configuration
-          params:
-            repository: configuration-commit
-            merge: true
+    ensure: *make-state-commit
 - name: pas
   serial: true
   plan:
@@ -249,34 +230,34 @@ jobs:
       passed: [ upgrade-opsman ]
       params:
         unpack: true
-    - get: pcf-automation-image
-      resource: pcf-automation
+    - get: platform-automation-image
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*image*"]
-    - get: pcf-automation-tasks
-      resource: pcf-automation
+    - get: platform-automation-tasks
+      resource: platform-automation
       params:
         unpack: true
         globs: ["*tasks*"]
 
   - task: credhub-interpolate
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
   - task: download-cf
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/download-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/download-product.yml
     input_mapping:
       config: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf.yml
 
   - task: upload-product
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/upload-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upload-product.yml
     input_mapping:
       product: downloaded-product
       env: interpolated-files
@@ -284,8 +265,8 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: stage-product
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/stage-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/stage-product.yml
     input_mapping:
       product: downloaded-product
       env: interpolated-files
@@ -293,8 +274,8 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: upload-pas-stemcell
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/upload-stemcell.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
     input_mapping:
       env: interpolated-files
       stemcell: downloaded-stemcell
@@ -302,8 +283,8 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: assign-stemcell
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/upload-stemcell.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
     input_mapping:
       env: interpolated-files
       config: assign-stemcell-config
@@ -311,8 +292,8 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: configure-pas
-    image: pcf-automation-image
-    file: pcf-automation-tasks/tasks/configure-product.yml
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/configure-product.yml
     input_mapping:
       config: configuration
       env: interpolated-files
@@ -324,7 +305,7 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
   - task: apply-product-changes
-    image: pcf-automation-image
+    image: platform-automation-image
     config:
       platform: linux
       inputs:
