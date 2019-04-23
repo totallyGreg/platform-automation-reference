@@ -248,7 +248,7 @@ jobs:
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
-  - task: download-cf
+  - task: download
     image: platform-automation-image
     file: platform-automation-tasks/tasks/download-product.yml
     input_mapping:
@@ -274,7 +274,7 @@ jobs:
     params:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
-  - task: upload-pas-stemcell
+  - task: upload-stemcell
     image: platform-automation-image
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     input_mapping:
@@ -283,7 +283,7 @@ jobs:
     params:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
-  - task: configure-pas
+  - task: configure
     image: platform-automation-image
     file: platform-automation-tasks/tasks/configure-product.yml
     input_mapping:
@@ -312,6 +312,102 @@ jobs:
           cat /var/version && echo ""
           set -eux
           om --env env/"${ENV_FILE}" apply-changes --product-name cf
+    input_mapping:
+      env: interpolated-files
+    params:
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+
+- name: healthwatch
+  serial: true
+  plan:
+  - aggregate:
+    - get: configuration
+      trigger: true
+      passed: [ pas ]
+      params:
+        unpack: true
+    - get: platform-automation-image
+      resource: platform-automation
+      params:
+        unpack: true
+        globs: ["*image*"]
+    - get: platform-automation-tasks
+      resource: platform-automation
+      params:
+        unpack: true
+        globs: ["*tasks*"]
+
+  - task: credhub-interpolate
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/credhub-interpolate.yml
+    params: *credhub_interpolate_params
+    input_mapping:
+      files: configuration
+
+  - task: download
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/download-product.yml
+    input_mapping:
+      config: interpolated-files
+    params:
+      CONFIG_FILE: environments/((foundation))/config/secrets/versions/p-healthwatch.yml
+
+  - task: upload-product
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upload-product.yml
+    input_mapping:
+      product: downloaded-product
+      env: interpolated-files
+    params:
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+
+  - task: stage-product
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/stage-product.yml
+    input_mapping:
+      product: downloaded-product
+      env: interpolated-files
+    params:
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+
+  - task: upload-stemcell
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: downloaded-stemcell
+    params:
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+
+  - task: configure-pas
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/configure-product.yml
+    input_mapping:
+      config: configuration
+      env: interpolated-files
+      vars: configuration
+      secrets: interpolated-files
+    params:
+      CONFIG_FILE: environments/((foundation))/config/templates/p-healthwatch.yml
+      VARS_FILES: vars/environments/((foundation))/config/defaults/p-healthwatch.yml vars/environments/((foundation))/config/vars/p-healthwatch.yml secrets/environments/((foundation))/config/secrets/templates/p-healthwatch.yml
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+
+  - task: apply-product-changes
+    image: platform-automation-image
+    config:
+      platform: linux
+      inputs:
+      - name: env
+      params:
+        ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      run:
+        path: /bin/bash
+        args:
+        - -c
+        - |
+          cat /var/version && echo ""
+          set -eux
+          om --env env/"${ENV_FILE}" apply-changes --product-name p-healthwatch
     input_mapping:
       env: interpolated-files
     params:

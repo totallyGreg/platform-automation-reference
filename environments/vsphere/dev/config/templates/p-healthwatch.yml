@@ -39,12 +39,8 @@ product-properties:
   .healthwatch-forwarder.worker_instance_count:
     value: ((healthwatch-forwarder/worker_instance_count))
   .properties.boshtasks:
-    value: enable
-  .properties.boshtasks.enable.bosh_taskcheck_password:
-    value:
-      secret: ((boshtasks/enable/bosh_taskcheck_password))
-  .properties.boshtasks.enable.bosh_taskcheck_username:
-    value: ((boshtasks/enable/bosh_taskcheck_username))
+    selected_option: disable
+    value: disable
   .properties.indicators_selector:
     value: "No"
   .properties.opsman:
