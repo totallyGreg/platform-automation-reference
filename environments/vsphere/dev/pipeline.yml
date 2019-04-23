@@ -12,11 +12,6 @@ resources:
     api_token: {{pivnet_token}}
     product_slug: platform-automation
 
-- name: pcf-automation-image-fixes
-  type: docker-image
-  source:
-    repository: cwashburn/platform-automation-fixes
-
 - name: installation
   type: s3
   source:
@@ -66,7 +61,6 @@ jobs:
         unpack: true
         globs: ["*tasks*"]
     - get: state
-    - get: pcf-automation-image-fixes
   - task: remove-timestamp
     image: pcf-automation-image
     config:
@@ -82,26 +76,24 @@ jobs:
         - |
           mv state/*state.yml timestamp-state/state.yml
   - task: credhub-interpolate
-    image: pcf-automation-image-fixes
-    file: configuration/fixes/tasks/credhub-interpolate.yml
+    image: pcf-automation-image
+    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
     params:
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "((foundation))/config"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
     input_mapping:
       files: configuration
-    output_mapping:
-      interpolated-files: configuration
   - task: download-opsman-image
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/download-product.yml
     input_mapping:
-      config: configuration
+      config: interpolated-files
     params:
-      CONFIG_FILE: ((foundation))/config/versions/opsman.yml
+      CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
   - task: create-vm
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/create-vm.yml
@@ -109,11 +101,11 @@ jobs:
       image: downloaded-product
       state: timestamp-state
       config: configuration
-      vars: configuaration
+      vars: configuration
     params:
       STATE_FILE: state/state.yml
-      OPSMAN_CONFIG_FILE: ((foundation))/config/templates/opsman.yml
-      VARS_FILES: config/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
+      OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
+      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
   - task: add-timestamp
     image: pcf-automation-image
     config:
@@ -137,31 +129,28 @@ jobs:
     file: pcf-automation-tasks/tasks/configure-authentication.yml
     attempts: 20
     input_mapping:
-      env: configuration
-      config: configuration
-      vars: configuaration
+      env: interpolated-files
+      config: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
-      AUTH_CONFIG_FILE: ((foundation))/config/templates/auth.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      AUTH_CONFIG_FILE: environments/((foundation))/config/templates/auth.yml
   - task: configure-director
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/configure-director.yml
     input_mapping:
       config: configuration
-      env: configuration
-      vars: configuaration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
-      DIRECTOR_CONFIG_FILE: ((foundation))/config/templates/director.yml
-      VARS_FILES: config/((foundation))/config/vars/common.yml config/((foundation))/config/vars/director.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      DIRECTOR_CONFIG_FILE: environments/((foundation))/config/templates/director.yml
+      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/director.yml
   - task: apply-director-changes
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/apply-director-changes.yml
     input_mapping:
-      env: configuration
-      vars: configuaration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
 - name: export-installation
   serial: true
@@ -183,28 +172,25 @@ jobs:
       params:
         unpack: true
         globs: ["*tasks*"]
-    - get: pcf-automation-image-fixes
   - task: credhub-interpolate
-    image: pcf-automation-image-fixes
-    file: configuration/fixes/tasks/credhub-interpolate.yml
+    image: pcf-automation-image
+    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
     params:
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "((foundation))/config"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
     input_mapping:
       files: configuration
-    output_mapping:
-      interpolated-files: configuration
   - task: export-installation
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/export-installation.yml
     input_mapping:
-      env: configuration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
   - task: add-timestamp
     image: pcf-automation-image
     config:
@@ -247,21 +233,18 @@ jobs:
     - get: installation
       passed: [ export-installation ]
     - get: state
-    - get: pcf-automation-image-fixes
   - task: credhub-interpolate
-    image: pcf-automation-image-fixes
-    file: configuration/fixes/tasks/credhub-interpolate.yml
+    image: pcf-automation-image
+    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
     params:
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "((foundation))/config"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
     input_mapping:
       files: configuration
-    output_mapping:
-      interpolated-files: configuration
   - task: remove-timestamp
     image: pcf-automation-image
     config:
@@ -283,9 +266,9 @@ jobs:
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/download-product.yml
     input_mapping:
-      config: configuration
+      config: interpolated-files
     params:
-      CONFIG_FILE: ((foundation))/config/versions/opsman.yml
+      CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
   - task: upgrade-opsman
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/upgrade-opsman.yml
@@ -293,13 +276,13 @@ jobs:
       image: downloaded-product
       state: timestamp-state
       config: configuration
-      env: configuration
+      env: interpolated-files
       installation: timestamp-installation
       vars: configuration
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
-      OPSMAN_CONFIG_FILE: ((foundation))/config/templates/opsman.yml
-      VARS_FILES: config/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
+      OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
+      VARS_FILES: config/environments/((foundation))/config/vars/common.yml config/((foundation))/config/vars/opsman.yml
       STATE_FILE: state.yml
   - task: add-timestamp
     image: pcf-automation-image
@@ -339,77 +322,75 @@ jobs:
       params:
         unpack: true
         globs: ["*tasks*"]
-    - get: pcf-automation-image-fixes
 
   - task: credhub-interpolate
-    image: pcf-automation-image-fixes
-    file: configuration/fixes/tasks/credhub-interpolate.yml
+    image: pcf-automation-image
+    file: pcf-automation-tasks/tasks/credhub-interpolate.yml
     params:
       CREDHUB_CLIENT: ((credhub-client))
       CREDHUB_SECRET: ((credhub-secret))
       CREDHUB_SERVER: ((credhub-server))
       CREDHUB_CA_CERT: ((credhub-ca))
       PREFIX: '/((foundation))'
-      INTERPOLATION_PATH: "((foundation))/config"
+      INTERPOLATION_PATH: "environments/((foundation))/config/secret_templates environments/((foundation))/config/versions"
     input_mapping:
       files: configuration
-    output_mapping:
-      interpolated-files: configuration
   - task: download-cf
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/download-product.yml
     input_mapping:
-      config: configuration
+      config: interpolated-files
     params:
-      CONFIG_FILE: ((foundation))/config/versions/cf.yml
+      CONFIG_FILE: environments/((foundation))/config/versions/cf.yml
 
   - task: upload-product
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/upload-product.yml
     input_mapping:
       product: downloaded-product
-      env: configuration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
   - task: stage-product
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/stage-product.yml
     input_mapping:
       product: downloaded-product
-      env: configuration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
   - task: upload-pas-stemcell
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/upload-stemcell.yml
     input_mapping:
-      env: configuration
+      env: interpolated-files
       stemcell: downloaded-stemcell
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
   - task: assign-stemcell
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/upload-stemcell.yml
     input_mapping:
-      env: configuration
+      env: interpolated-files
       config: assign-stemcell-config
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
   - task: configure-pas
     image: pcf-automation-image
     file: pcf-automation-tasks/tasks/configure-product.yml
     input_mapping:
       config: configuration
-      env: configuration
+      env: interpolated-files
       vars: configuration
+      secrets: interpolated-files
     params:
-      CONFIG_FILE: ((foundation))/config/templates/cf.yml
+      CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
       VARS_FILES: vars/((foundation))/config/vars/cf.yml
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
 
   - task: apply-product-changes
     image: pcf-automation-image
@@ -418,7 +399,7 @@ jobs:
       inputs:
       - name: env
       params:
-        ENV_FILE: ((foundation))/config/templates/env.yml
+        ENV_FILE: environments/((foundation))/config/templates/env.yml
       run:
         path: /bin/bash
         args:
@@ -428,6 +409,6 @@ jobs:
           set -eux
           om --env env/"${ENV_FILE}" apply-changes --product-name cf
     input_mapping:
-      env: configuration
+      env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/config/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/templates/env.yml
