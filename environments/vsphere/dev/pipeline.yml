@@ -29,6 +29,7 @@ resources:
     uri: git@github.com:calebwashburn/platform-automation-reference.git
     private_key: {{git_private_key}}
     paths: ["environments/((foundation))/config"]
+    branch: master
 
 jobs:
 - name: install-opsman
