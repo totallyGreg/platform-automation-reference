@@ -108,8 +108,6 @@ product-properties:
     value: ((cf_networking_enable_space_developer_self_service))
   .properties.cf_networking_internal_domain:
     value: ((cf_networking_internal_domain))
-  .properties.cloud_controller_completed_tasks_cutoff_age_in_days:
-    value: ((cloud_controller_completed_tasks_cutoff_age_in_days))
   .properties.cloud_controller_default_health_check_timeout:
     value: ((cloud_controller_default_health_check_timeout))
   .properties.cloud_controller_temporary_disable_deployments:
