@@ -50,22 +50,22 @@ run:
          --config download-config/"${DOWNLOAD_CONFIG_FILE}" \
          --output-directory ${downloaded_files}
 
-       { printf "\nReading product details..."; } 2> /dev/null
-       # shellcheck disable=SC2068
-       product_slug=$(om interpolate \
+      { printf "\nReading product details..."; } 2> /dev/null
+      # shellcheck disable=SC2068
+      product_slug=$(om interpolate \
          --config download-config/"${DOWNLOAD_CONFIG_FILE}" \
          --path /pivnet-product-slug)
 
-       product_file=$(om interpolate \
+      product_file=$(om interpolate \
          --config ${downloaded_files}/download-file.json \
          --path /product_path)
 
-       stemcell_file=$(om interpolate \
+      stemcell_file=$(om interpolate \
          --config ${downloaded_files}/download-file.json \
          --path /stemcell_path?)
 
-       { printf "\nChecking if product needs winfs injected..."; } 2> /dev/null
-       if [ "$product_slug" == "pas-windows" ]; then
+      { printf "\nChecking if product needs winfs injected..."; } 2> /dev/null
+      if [ "$product_slug" == "pas-windows" ]; then
          TILE_FILENAME="$(basename "$product_file")"
 
          # The winfs-injector determines the necessary windows image,
@@ -74,24 +74,26 @@ run:
          winfs-injector \
          --input-tile "$product_file" \
          --output-tile "${downloaded_files}/${TILE_FILENAME}"
-       fi
+      fi
 
-       om --env env/"${ENV_FILE}" upload-product \
-          --product ${downloaded_files}/*.pivotal
+      om --env env/"${ENV_FILE}" upload-product \
+         --product ${downloaded_files}/*.pivotal
 
-       om --env env/"${ENV_FILE}" upload-stemcell \
-          --floating="$FLOATING_STEMCELL" \
-          --stemcell "${downloaded_files}"/*.tgz
+      om --env env/"${ENV_FILE}" upload-stemcell \
+         --floating="$FLOATING_STEMCELL" \
+         --stemcell "${downloaded_files}"/*.tgz
 
-       product_name="$(om tile-metadata \
-          --product-path ${downloaded_files}/*.pivotal \
-          --product-name)"
+      product_name="$(om tile-metadata \
+         --product-path ${downloaded_files}/*.pivotal \
+         --product-name)"
 
-       product_version="$(om tile-metadata \
-          --product-path ${downloaded_files}/*.pivotal \
-          --product-version)"
+      product_version="$(om tile-metadata \
+         --product-path ${downloaded_files}/*.pivotal \
+         --product-version)"
 
-       om --env env/"${ENV_FILE}" stage-product \
-          --product-name "$product_name" \
-          --product-version "$product_version"
+      om --env env/"${ENV_FILE}" stage-product \
+         --product-name "$product_name" \
+         --product-version "$product_version"
+
+      rm -rf ${downloaded_files}
     fi
