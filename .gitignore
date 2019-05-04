@@ -1,1 +1,3 @@
 pipeline-vars.yml
+.envrc
+.env
