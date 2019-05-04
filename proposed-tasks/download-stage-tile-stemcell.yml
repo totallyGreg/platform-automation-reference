@@ -77,7 +77,7 @@ run:
        fi
 
        om --env env/"${ENV_FILE}" upload-product \
-          --product product/*.pivotal
+          --product ${downloaded_files}/*.pivotal
 
        om --env env/"${ENV_FILE}" upload-stemcell \
           --floating="$FLOATING_STEMCELL" \
