@@ -5,8 +5,8 @@ network_name: deployment
 security_acknowledgement: X
 singleton_availability_zone: AZ1
 ha_proxy/skip_cert_verify: false
-router/static_ips: 192.168.2.12,192.168.2.13
-control/static_ips: 192.168.2.14,192.168.2.15
+router/static_ips: 192.168.2.11,192.168.2.12
+control/static_ips: 192.168.2.13
 az2_name: AZ2
 az3_name: AZ3
 credhub_key_encryption_passwords_0/name: credhub
