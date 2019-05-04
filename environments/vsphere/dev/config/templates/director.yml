@@ -21,6 +21,10 @@ properties-configuration:
     ntp_servers_string: ((ntp))
     resurrector_enabled: true
     post_deploy_enabled: false
+  security_configuration:
+    generate_vm_passwords: true
+    opsmanager_root_ca_trusted_certs: true
+    trusted_certificates: ((bosh_trusted_certs))
 az-configuration:
 - name: AZ1
   clusters:
