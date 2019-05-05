@@ -6,7 +6,7 @@ security_acknowledgement: X
 singleton_availability_zone: AZ1
 ha_proxy/skip_cert_verify: false
 router/static_ips:
-control/static_ips: 
+control/static_ips:
 az2_name: AZ2
 az3_name: AZ3
 credhub_key_encryption_passwords_0/name: credhub
@@ -18,3 +18,13 @@ router_instances: 2
 compute_instances: 5
 router_additional_vm_extensions: ["router-lb"]
 control_additional_vm_extensions: ["sshproxy-lb"]
+deploy-autoscaler_post_deploy_state: off
+deploy-notifications-ui_post_deploy_state: off
+deploy-notifications_post_deploy_state: off
+metric_registrar_smoke_test_post_deploy_state: off
+nfsbrokerpush_post_deploy_state: off
+push-apps-manager_post_deploy_state: off
+push-usage-service_post_deploy_state: off
+smbbrokerpush_post_deploy_state: off
+smoke_tests_post_deploy_state: off
+test-autoscaling_post_deploy_state: off
