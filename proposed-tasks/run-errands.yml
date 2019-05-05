@@ -23,14 +23,14 @@ run:
     if [ -z "$OPSMAN_SSH_PRIVATE_KEY" ]; then
       ssh_key=$(mktemp)
       echo "${OPSMAN_SSH_PRIVATE_KEY}" > ${ssh_key}
-      eval "$(om --env interpolated-files/${ENV_FILE} bosh-env --ssh-private-key ${ssh_key})"
+      eval "$(om --env env/${ENV_FILE} bosh-env --ssh-private-key ${ssh_key})"
     else
-      eval "$(om --env interpolated-files/${ENV_FILE} bosh-env)"
+      eval "$(om --env env/${ENV_FILE} bosh-env)"
     fi
 
-    product=$(bosh int configuration/${CONFIG_FILE} --path /product-name)
+    product=$(bosh int config/${CONFIG_FILE} --path /product-name)
     staged_products=$(mktemp)
-    om --env interpolated-files/${ENV_FILE} curl -p /api/v0/staged/products  > ${staged_products}
+    om --env env/${ENV_FILE} curl -p /api/v0/staged/products  > ${staged_products}
     installation=$(bosh int ${staged_products} --path /type=${product}/installation_name)
 
     while IFS= read -r errand
