@@ -5,7 +5,7 @@ network_name: deployment
 security_acknowledgement: X
 singleton_availability_zone: AZ1
 ha_proxy/skip_cert_verify: false
-router/static_ips: 192.168.2.11,192.168.2.12
+router/static_ips:
 control/static_ips: 192.168.2.13
 az2_name: AZ2
 az3_name: AZ3
@@ -16,3 +16,4 @@ stack_migration_acknowledgement: X
 tcp_router_instances: 0
 router_instances: 2
 compute_instances: 5
+router_additional_vm_extensions: ["router-lb"]

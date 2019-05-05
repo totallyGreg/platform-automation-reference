@@ -68,3 +68,11 @@ networks-configuration:
       - AZ1
       - AZ2
       - AZ3
+vmextensions-configuration:
+- name: router-lb
+  cloud_properties:
+    nsxt:
+      lb:
+        server_pools:
+        - name: PAS-GoRouter443ServerPool
+          port: 443

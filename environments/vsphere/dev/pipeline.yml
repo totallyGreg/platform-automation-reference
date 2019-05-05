@@ -127,13 +127,6 @@ jobs:
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
       DIRECTOR_CONFIG_FILE: environments/((foundation))/config/templates/director.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/director.yml secrets/environments/((foundation))/config/secrets/templates/director.yml
-  - task: apply-director-changes
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/apply-director-changes.yml
-    input_mapping:
-      env: interpolated-files
-    params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
 - name: export-installation
   serial: true
@@ -215,6 +208,14 @@ jobs:
       VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
     ensure: *make-state-commit
+
+  - task: apply-director-changes
+    image: platform-automation-image
+    file: platform-automation-tasks/tasks/apply-director-changes.yml
+    input_mapping:
+      env: interpolated-files
+    params:
+      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
 - name: pas
   serial: true
