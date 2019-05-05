@@ -254,6 +254,7 @@ jobs:
       env: interpolated-files
     params:
       DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf.yml
+      DOWNLOAD_STEMCELL_CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf-stemcell.yml
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
 
