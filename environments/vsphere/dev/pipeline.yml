@@ -31,6 +31,13 @@ resources:
     paths: ["proposed-tasks","environments/((foundation))/config"]
     branch: master
 
+- name: state
+  type: git
+  source:
+    uri: git@github.com:calebwashburn/platform-automation-reference.git
+    private_key: {{git_private_key}}
+    branch: master
+
 jobs:
 - name: install-opsman
   serial: true
@@ -39,8 +46,7 @@ jobs:
   - aggregate:
     - get: configuration
       trigger: true
-      params:
-        unpack: true
+    - get: state
     - get: platform-automation-image
       resource: platform-automation
       params:
@@ -69,7 +75,7 @@ jobs:
     file: configuration/proposed-tasks/download-create-opsman.yml
     input_mapping:
       download-config: interpolated-files
-      state: configuration
+      state: state
       config: configuration
       vars: configuration
       secrets: interpolated-files
@@ -84,21 +90,21 @@ jobs:
           image: platform-automation-image
           file: configuration/proposed-tasks/make-commit.yml
           input_mapping:
-            repository: configuration
+            repository: state
             file-source: generated-state
           output_mapping:
-            repository-commit: configuration-commit
+            repository-commit: state-commit
           params:
             FILE_SOURCE_PATH: state.yml
             FILE_DESTINATION_PATH: state/((foundation))/state.yml
             GIT_AUTHOR_EMAIL: "cwashburn@pivotal.io"
             GIT_AUTHOR_NAME: "Platform Automation"
             COMMIT_MESSAGE: 'Update state file'
-
-        - put: configuration
+        - put: state
           params:
-            repository: configuration-commit
+            repository: state-commit
             merge: true
+
   - task: configure-authentication
     image: platform-automation-image
     file: platform-automation-tasks/tasks/configure-authentication.yml
@@ -137,8 +143,6 @@ jobs:
     - get: configuration
       trigger: true
       passed: [ install-opsman ]
-      params:
-        unpack: true
     - get: platform-automation-image
       resource: platform-automation
       params:
@@ -174,8 +178,7 @@ jobs:
     - get: configuration
       trigger: true
       passed: [ export-installation ]
-      params:
-        unpack: true
+    - get: state
     - get: platform-automation-image
       resource: platform-automation
       params:
@@ -199,7 +202,7 @@ jobs:
     file: configuration/proposed-tasks/download-upgrade-opsman.yml
     input_mapping:
       download-config: interpolated-files
-      state: configuration
+      state: state
       config: configuration
       vars: configuration
       secrets: interpolated-files
@@ -220,8 +223,6 @@ jobs:
     - get: configuration
       trigger: true
       passed: [ upgrade-opsman ]
-      params:
-        unpack: true
     - get: platform-automation-image
       resource: platform-automation
       params:
