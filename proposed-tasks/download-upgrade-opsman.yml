@@ -45,7 +45,7 @@ params:
   ENV_FILE: env.yml
   # - Filepath of the env config YAML
   # - Relative to root of the `env` input
-  
+
 run:
   path: bash
   args:
@@ -70,6 +70,12 @@ run:
       echo "${expected_version} already installed"
       exit 0
     else
+      vars_files_args=("")
+      for vf in ${VARS_FILES}
+      do
+        vars_files_args+=("--vars-file ${vf}")
+      done
+
       downloaded_files=$(mktemp -d)
       # shellcheck disable=SC2068
       om download-product \
