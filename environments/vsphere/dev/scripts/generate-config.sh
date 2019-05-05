@@ -26,7 +26,7 @@ if [ ! -f ${wrkdir}/product.yml ]; then
   exit 1
 fi
 
-ops_files="${product}-operations.yml"
+ops_files="${product}-operations"
 if [ -f ${ops_files} ]; then
   ops_files_args=("")
   while IFS= read -r var

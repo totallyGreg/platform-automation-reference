@@ -1,0 +1,43 @@
+---
+platform: linux
+
+inputs:
+- name: config
+- name: env
+
+params:
+  CONFIG_FILE: product.yml
+  ERRAND_FILE:
+  ENV_FILE: env.yml
+  OPSMAN_SSH_PRIVATE_KEY:
+  INSTANCE:
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    cat /var/version && echo ""
+    set -eu
+
+    if [ -z "$OPSMAN_SSH_PRIVATE_KEY" ]; then
+      ssh_key=$(mktemp)
+      echo "${OPSMAN_SSH_PRIVATE_KEY}" > ${ssh_key}
+      eval "$(om --env interpolated-files/${ENV_FILE} bosh-env --ssh-private-key ${ssh_key})"
+    else
+      eval "$(om --env interpolated-files/${ENV_FILE} bosh-env)"
+    fi
+
+    product=$(bosh int configuration/${CONFIG_FILE} --path /product-name)
+    staged_products=$(mktemp)
+    om --env interpolated-files/${ENV_FILE} curl -p /api/v0/staged/products  > ${staged_products}
+    installation=$(bosh int ${staged_products} --path /type=${product}/installation_name)
+
+    while IFS= read -r errand
+    do
+      if [ -z "$INSTANCE" ]; then
+        bosh -d ${installation} run-errand ${errand}
+      else
+        bosh -d ${installation} run-errand ${errand} --instance ${INSTANCE}
+      fi
+    done < "$ERRAND_FILE"
