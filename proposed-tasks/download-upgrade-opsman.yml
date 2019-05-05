@@ -41,6 +41,11 @@ params:
   # - Filepath of the installation ZIP file
   # - The filepath provided can be wildcard expanded.
   # - The path is relative to root of the `installation` input
+
+  ENV_FILE: env.yml
+  # - Filepath of the env config YAML
+  # - Relative to root of the `env` input
+  
 run:
   path: bash
   args:
