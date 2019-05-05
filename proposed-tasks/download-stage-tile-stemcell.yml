@@ -10,18 +10,20 @@ params:
   ENV_FILE: env.yml
   # - Filepath of the env config YAML
   # - Relative to root of the `env` input
-  DOWNLOAD_CONFIG_FILE: download-config.yml
+
+  DOWNLOAD_CONFIG_FILE: product-version.yml
   # - Filepath to the download product configuration yaml file
-  # - The path is relative to the root of the `config` input
+  # - The path is relative to the root of the `download-config` input
+
+  DOWNLOAD_STEMCELL_CONFIG_FILE: stemcell-version.yml
+  # - Filepath to the download stemcell configuration yaml file
+  # - The path is relative to the root of the `download-config` input
 
   CONFIG_FILE: config.yml
   # - Filepath to the product configuration yaml file
   # - The path is relative to the root of the `config` input
 
-  FLOATING_STEMCELL: true
-  # - Optional
-  # - Assigns the stemcell to all compatible products
-  # - If false, a user is required to run the assign-stemcell task
+
 
 run:
   path: bash
@@ -60,10 +62,6 @@ run:
          --config ${downloaded_files}/download-file.json \
          --path /product_path)
 
-      stemcell_file=$(om interpolate \
-         --config ${downloaded_files}/download-file.json \
-         --path /stemcell_path?)
-
       { printf "\nChecking if product needs winfs injected..."; } 2> /dev/null
       if [ "$product_slug" == "pas-windows" ]; then
          TILE_FILENAME="$(basename "$product_file")"
@@ -79,10 +77,6 @@ run:
       om --env env/"${ENV_FILE}" upload-product \
          --product ${downloaded_files}/*.pivotal
 
-      om --env env/"${ENV_FILE}" upload-stemcell \
-         --floating="$FLOATING_STEMCELL" \
-         --stemcell "${downloaded_files}"/*.tgz
-
       product_name="$(om tile-metadata \
          --product-path ${downloaded_files}/*.pivotal \
          --product-name)"
@@ -96,4 +90,29 @@ run:
          --product-version "$product_version"
 
       rm -rf ${downloaded_files}
+    fi
+
+    if [ -f "download-config/${DOWNLOAD_STEMCELL_CONFIG_FILE}" ]; then
+      expected_stemcell_version=$(bosh int download-config/${DOWNLOAD_STEMCELL_CONFIG_FILE} --path /product-version)
+      stemcell_assignments=$(mktemp)
+      om --env env/"${ENV_FILE}" curl -p /api/v0/stemcell_assignments > ${stemcell_assignments}
+      set +e
+      bosh int ${stemcell_assignments} --path /stemcell_library/version=${expected_stemcell_version}
+      rc=$?
+      set -e
+      if [ ${rc} -eq 1 ]; then
+        downloaded_files=$(mktemp -d)
+
+        om download-product \
+           --config download-config/"${DOWNLOAD_STEMCELL_CONFIG_FILE}" \
+           --output-directory ${downloaded_files}
+
+        om --env env/"${ENV_FILE}" upload-stemcell \
+           --floating=false \
+           --stemcell "${downloaded_files}"/*.tgz
+
+        rm -rf ${downloaded_files}
+      fi
+
+      om --env env/"${ENV_FILE}" assign-stemcell --product ${expected_product} --stemcell ${expected_stemcell_version}
     fi

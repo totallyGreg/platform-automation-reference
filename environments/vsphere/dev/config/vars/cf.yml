@@ -15,3 +15,4 @@ credhub_key_encryption_passwords_0/primary: true
 stack_migration_acknowledgement: X
 tcp_router_instances: 0
 router_instances: 2
+compute_instances: 5
