@@ -338,6 +338,7 @@ resource-config:
       id: ((compute_instance_type))
     instances: ((compute_instances))
   control:
+    additional_vm_extensions: ((control_additional_vm_extensions))
     instance_type:
       id: ((control_instance_type))
     instances: ((control_instances))

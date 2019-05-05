@@ -6,7 +6,7 @@ security_acknowledgement: X
 singleton_availability_zone: AZ1
 ha_proxy/skip_cert_verify: false
 router/static_ips:
-control/static_ips: 192.168.2.13
+control/static_ips: 
 az2_name: AZ2
 az3_name: AZ3
 credhub_key_encryption_passwords_0/name: credhub
@@ -17,3 +17,4 @@ tcp_router_instances: 0
 router_instances: 2
 compute_instances: 5
 router_additional_vm_extensions: ["router-lb"]
+control_additional_vm_extensions: ["sshproxy-lb"]
