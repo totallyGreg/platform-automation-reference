@@ -75,7 +75,7 @@ jobs:
       secrets: interpolated-files
     params:
       DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
-      STATE_FILE: environments/((foundation))/state/state.yml
+      STATE_FILE: state/((foundation))/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
     ensure: &make-state-commit
@@ -90,7 +90,7 @@ jobs:
             repository-commit: configuration-commit
           params:
             FILE_SOURCE_PATH: state.yml
-            FILE_DESTINATION_PATH: environments/((foundation))/state/state.yml
+            FILE_DESTINATION_PATH: state/((foundation))/state.yml
             GIT_AUTHOR_EMAIL: "cwashburn@pivotal.io"
             GIT_AUTHOR_NAME: "Platform Automation"
             COMMIT_MESSAGE: 'Update state file'
@@ -207,12 +207,12 @@ jobs:
       env: interpolated-files
     params:
       DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
-      STATE_FILE: environments/((foundation))/state/state.yml
+      STATE_FILE: state/((foundation))/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
       VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
       ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
     ensure: *make-state-commit
-    
+
 - name: pas
   serial: true
   plan:

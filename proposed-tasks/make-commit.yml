@@ -49,6 +49,8 @@ run:
 
       git clone repository repository-commit
 
+      mkdir -p $(dirname repository-commit/"$FILE_DESTINATION_PATH")
+
       cp file-source/"$FILE_SOURCE_PATH" \
          repository-commit/"$FILE_DESTINATION_PATH"
       cd repository-commit
