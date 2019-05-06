@@ -40,4 +40,4 @@ run:
       else
         bosh -d ${installation} run-errand ${errand} --instance ${INSTANCE}
       fi
-    done < "$ERRAND_FILE"
+    done < config/"$ERRAND_FILE"
