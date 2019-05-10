@@ -80,10 +80,14 @@ jobs:
       vars: configuration
       secrets: interpolated-files
     params:
-      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
+      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
       STATE_FILE: state/((foundation))/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
-      VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
+      VARS_FILES: |
+        vars/environments/((foundation))/config/vars/opsman.yml
+        secrets/environments/((foundation))/config/secrets/opsman.yml
+        secrets/environments/((foundation))/config/secrets/pivnet.yml
+
     ensure: &make-state-commit
       do:
         - task: make-commit
@@ -113,8 +117,8 @@ jobs:
       env: interpolated-files
       config: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
-      AUTH_CONFIG_FILE: environments/((foundation))/config/secrets/templates/auth.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
+      AUTH_CONFIG_FILE: environments/((foundation))/config/secrets/auth.yml
   - task: configure-director
     image: platform-automation-image
     file: platform-automation-tasks/tasks/configure-director.yml
@@ -124,9 +128,9 @@ jobs:
       vars: configuration
       secrets: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
       DIRECTOR_CONFIG_FILE: environments/((foundation))/config/templates/director.yml
-      VARS_FILES: vars/environments/((foundation))/config/vars/director.yml secrets/environments/((foundation))/config/secrets/templates/director.yml
+      VARS_FILES: vars/environments/((foundation))/config/vars/director.yml secrets/environments/((foundation))/config/secrets/director.yml
 
 - name: export-installation
   serial: true
@@ -158,7 +162,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
   - put: installation
     params:
       file: installation/installation-*.zip
@@ -190,7 +194,7 @@ jobs:
     params: *credhub_interpolate_params
     input_mapping:
       files: configuration
-  - task: download-opsman-image
+  - task: download-upgrade-opsman
     image: platform-automation-image
     file: configuration/proposed-tasks/download-upgrade-opsman.yml
     input_mapping:
@@ -202,11 +206,14 @@ jobs:
       installation: installation
       env: interpolated-files
     params:
-      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/opsman.yml
+      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/versions/opsman.yml
       STATE_FILE: state/((foundation))/state.yml
       OPSMAN_CONFIG_FILE: environments/((foundation))/config/templates/opsman.yml
-      VARS_FILES: vars/environments/((foundation))/config/vars/opsman.yml secrets/environments/((foundation))/config/secrets/templates/opsman.yml
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      VARS_FILES: |
+        vars/environments/((foundation))/config/vars/opsman.yml
+        secrets/environments/((foundation))/config/secrets/opsman.yml
+        secrets/environments/((foundation))/config/secrets/pivnet.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
     ensure: *make-state-commit
 
   - task: apply-director-changes
@@ -215,7 +222,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
 
 - name: pas
   serial: true
@@ -247,13 +254,15 @@ jobs:
     file: configuration/proposed-tasks/download-stage-tile-stemcell.yml
     input_mapping:
       config: configuration
-      download-config: interpolated-files
+      download-config: configuration
       env: interpolated-files
+      secrets: interpolated-files
     params:
-      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf.yml
-      DOWNLOAD_STEMCELL_CONFIG_FILE: environments/((foundation))/config/secrets/versions/cf-stemcell.yml
+      DOWNLOAD_CONFIG_FILE: environments/((foundation))/config/versions/cf.yml
+      DOWNLOAD_STEMCELL_CONFIG_FILE: environments/((foundation))/config/versions/cf-stemcell.yml
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
+      VARS_FILES: secrets/environments/((foundation))/config/secrets/pivnet.yml
 
   - task: configure
     image: platform-automation-image
@@ -265,8 +274,8 @@ jobs:
       secrets: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
-      VARS_FILES: vars/environments/((foundation))/config/defaults/cf.yml vars/environments/((foundation))/config/vars/cf.yml secrets/environments/((foundation))/config/secrets/templates/cf.yml
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      VARS_FILES: vars/environments/((foundation))/config/defaults/cf.yml vars/environments/((foundation))/config/vars/cf.yml secrets/environments/((foundation))/config/secrets/cf.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
 
   - task: apply-product-changes
     image: platform-automation-image
@@ -276,7 +285,7 @@ jobs:
       env: interpolated-files
     params:
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
 
 - name: pas-errands
   plan:
@@ -311,6 +320,6 @@ jobs:
     params:
       CONFIG_FILE: environments/((foundation))/config/templates/cf.yml
       ERRAND_FILE: environments/((foundation))/config/errands/cf
-      ENV_FILE: environments/((foundation))/config/secrets/templates/env.yml
+      ENV_FILE: environments/((foundation))/config/secrets/env.yml
       OPSMAN_SSH_PRIVATE_KEY: ((opsman_ssh_private_key))
       INSTANCE: control/first

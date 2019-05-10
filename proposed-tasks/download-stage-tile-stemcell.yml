@@ -5,8 +5,18 @@ inputs:
 - name: config # contains download-file config file
 - name: env
 - name: download-config
+- name: vars # variable files to be made available
+  optional: true
+- name: secrets
+  optional: true
 
 params:
+  VARS_FILES:
+  # - Optional
+  # - Filepath to the Ops Manager vars yaml file
+  # - The path is relative to root of the task build,
+  #   so `vars` and `secrets` can be used.
+
   ENV_FILE: env.yml
   # - Filepath of the env config YAML
   # - Relative to root of the `env` input
@@ -22,8 +32,6 @@ params:
   CONFIG_FILE: config.yml
   # - Filepath to the product configuration yaml file
   # - The path is relative to the root of the `config` input
-
-
 
 run:
   path: bash
@@ -43,6 +51,12 @@ run:
     staged_version=$(bosh int ${staged_products} --path /name=${expected_product}/version)
     set -e
 
+    vars_files_args=("")
+    for vf in ${VARS_FILES}
+    do
+      vars_files_args+=("--vars-file ${vf}")
+    done
+
     if [ "${expected_version}" = "${staged_version}" ]; then
       echo "${expected_version} already staged"
     else
@@ -50,7 +64,8 @@ run:
       # shellcheck disable=SC2068
       om download-product \
          --config download-config/"${DOWNLOAD_CONFIG_FILE}" \
-         --output-directory ${downloaded_files}
+         --output-directory ${downloaded_files} \
+         ${vars_files_args[@]}
 
       { printf "\nReading product details..."; } 2> /dev/null
       # shellcheck disable=SC2068
@@ -100,12 +115,15 @@ run:
       bosh int ${stemcell_assignments} --path /stemcell_library/version=${expected_stemcell_version}
       rc=$?
       set -e
-      if [ ${rc} -eq 1 ]; then
+      if [ ${rc} -eq 0 ]; then
+        echo "Expected stemcell version ${expected_stemcell_version} already installed"
+      else
         downloaded_files=$(mktemp -d)
 
         om download-product \
            --config download-config/"${DOWNLOAD_STEMCELL_CONFIG_FILE}" \
-           --output-directory ${downloaded_files}
+           --output-directory ${downloaded_files} \
+           ${vars_files_args[@]}
 
         om --env env/"${ENV_FILE}" upload-stemcell \
            --floating=false \
