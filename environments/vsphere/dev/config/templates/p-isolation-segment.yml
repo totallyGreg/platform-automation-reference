@@ -1,0 +1,92 @@
+network-properties:
+  network:
+    name: ((network_name))
+  other_availability_zones:
+  - name: ((singleton_availability_zone))
+  - name: ((az2_name))
+  - name: ((az3_name))
+  singleton_availability_zone:
+    name: ((singleton_availability_zone))
+product-name: p-isolation-segment
+product-properties:
+  .isolated_diego_cell.placement_tag:
+    value: ((isolated_diego_cell/placement_tag))
+  .isolated_router.disable_insecure_cookies:
+    value: ((isolated_router/disable_insecure_cookies))
+  .isolated_router.drain_wait:
+    value: ((isolated_router/drain_wait))
+  .isolated_router.enable_write_access_logs:
+    value: ((isolated_router/enable_write_access_logs))
+  .isolated_router.enable_zipkin:
+    value: ((isolated_router/enable_zipkin))
+  .isolated_router.lb_healthy_threshold:
+    value: ((isolated_router/lb_healthy_threshold))
+  .isolated_router.request_timeout_in_seconds:
+    value: ((isolated_router/request_timeout_in_seconds))
+  .properties.enable_silk_policy_enforcement:
+    value: ((enable_silk_policy_enforcement))
+  .properties.enable_smb_volume_driver:
+    value: ((enable_smb_volume_driver))
+  .properties.garden_disk_cleanup:
+    value: reserved
+  .properties.gorouter_ssl_ciphers:
+    value: ((gorouter_ssl_ciphers))
+  .properties.haproxy_client_cert_validation:
+    value: none
+  .properties.haproxy_forward_tls:
+    selected_option: disable
+    value: disable
+  .properties.haproxy_hsts_support:
+    value: disable
+  .properties.haproxy_max_buffer_size:
+    value: ((haproxy_max_buffer_size))
+  .properties.haproxy_ssl_ciphers:
+    value: ((haproxy_ssl_ciphers))
+  .properties.networking_poe_ssl_certs:
+    value:
+    - certificate:
+        cert_pem: ((networking_poe_ssl_certs_0/certificate))
+        private_key_pem: ((networking_poe_ssl_certs_0/privatekey))
+      name: ((networking_poe_ssl_certs_0/name))
+  .properties.nfs_volume_driver:
+    value: enable
+  .properties.route_integrity:
+    value: tls_verify
+  .properties.route_services_internal_lookup:
+    value: ((route_services_internal_lookup))
+  .properties.router_backend_max_conn:
+    value: ((router_backend_max_conn))
+  .properties.router_client_cert_validation:
+    value: request
+  .properties.router_enable_proxy:
+    value: ((router_enable_proxy))
+  .properties.router_keepalive_connections:
+    value: enable
+  .properties.routing_disable_http:
+    value: ((routing_disable_http))
+  .properties.routing_log_client_ips:
+    value: log_client_ips
+  .properties.routing_minimum_tls_version:
+    value: tls_v1_2
+  .properties.routing_table_sharding_mode:
+    value: isolation_segment_only
+  .properties.routing_tls_termination:
+    value: load_balancer
+  .properties.skip_cert_verify:
+    value: ((skip_cert_verify))
+  .properties.system_logging:
+    value: disabled
+resource-config:
+  isolated_diego_cell:
+    instance_type:
+      id: ((isolated_diego_cell_instance_type))
+    instances: ((isolated_diego_cell_instances))
+  isolated_ha_proxy:
+    instance_type:
+      id: ((isolated_ha_proxy_instance_type))
+    instances: ((isolated_ha_proxy_instances))
+  isolated_router:
+    additional_vm_extensions: ((isolated_router_additional_vm_extensions))
+    instance_type:
+      id: ((isolated_router_instance_type))
+    instances: ((isolated_router_instances))

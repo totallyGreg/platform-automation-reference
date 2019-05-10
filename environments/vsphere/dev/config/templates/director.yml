@@ -83,3 +83,10 @@ vmextensions-configuration:
         server_pools:
         - name: PAS-SSHProxy222ServerPool
           port: 2222
+- name: isolated-router-lb
+  cloud_properties:
+    nsxt:
+      lb:
+        server_pools:
+        - name: PAS-IsolatedGoRouter443ServerPool
+          port: 443

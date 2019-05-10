@@ -27,14 +27,15 @@ if [ ! -f ${wrkdir}/product.yml ]; then
 fi
 
 ops_files="${product}-operations"
-if [ -f ${ops_files} ]; then
-  ops_files_args=("")
-  while IFS= read -r var
-  do
-    ops_files_args+=("-o ${wrkdir}/${var}")
-  done < "$ops_files"
-  bosh int ${wrkdir}/product.yml ${ops_files_args[@]} > ../environments/vsphere/dev/config/templates/${product}.yml
-fi
+touch ${ops_files}
+
+ops_files_args=("")
+while IFS= read -r var
+do
+  ops_files_args+=("-o ${wrkdir}/${var}")
+done < "$ops_files"
+bosh int ${wrkdir}/product.yml ${ops_files_args[@]} > ../environments/vsphere/dev/config/templates/${product}.yml
+
 
 rm -rf ../environments/vsphere/dev/config/defaults/${product}.yml
 touch ../environments/vsphere/dev/config/defaults/${product}.yml

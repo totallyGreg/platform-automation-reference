@@ -1,0 +1,9 @@
+az2_name: AZ2
+az3_name: AZ3
+isolated_diego_cell/placement_tag: "apps iso segment"
+isolated_router_additional_vm_extensions: ["isolated-router-lb"]
+network_name: deployment
+networking_poe_ssl_certs_0/name: apps
+singleton_availability_zone: AZ1
+isolated_diego_cell_instances: 5
+isolated_router_instances: 2
