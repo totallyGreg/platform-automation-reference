@@ -1,6 +1,4 @@
 features/haproxy_forward_tls-disable.yml
-optional/add-control-static_ips.yml
-optional/add-router-static_ips.yml
 network/3-az-configuration.yml
 resource/router_additional_vm_extensions.yml
 resource/control_additional_vm_extensions.yml

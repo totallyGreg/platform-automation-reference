@@ -8,7 +8,7 @@ fi
 
 product=$1
 echo "Generating configuration for product $product"
-versionfile="../config/secrets/versions/$product.yml"
+versionfile="../config/versions/$product.yml"
 if [ ! -f ${versionfile} ]; then
   echo "Must create ${versionfile}"
   exit 1

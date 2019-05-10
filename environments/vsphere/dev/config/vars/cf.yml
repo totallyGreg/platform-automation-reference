@@ -1,12 +1,10 @@
-cloud_controller/apps_domain: cfapps.haas-415.pez.pivotal.io
+cloud_controller/apps_domain: run.haas-415.pez.pivotal.io
 cloud_controller/system_domain: run.haas-415.pez.pivotal.io
 mysql_monitor/recipient_email: cwashburn@pivotal.io
 network_name: deployment
 security_acknowledgement: X
 singleton_availability_zone: AZ1
 ha_proxy/skip_cert_verify: false
-router/static_ips:
-control/static_ips:
 az2_name: AZ2
 az3_name: AZ3
 credhub_key_encryption_passwords_0/name: credhub

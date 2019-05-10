@@ -74,7 +74,7 @@ jobs:
     image: platform-automation-image
     file: configuration/proposed-tasks/download-create-opsman.yml
     input_mapping:
-      download-config: interpolated-files
+      download-config: configuration
       state: state
       config: configuration
       vars: configuration
@@ -198,7 +198,7 @@ jobs:
     image: platform-automation-image
     file: configuration/proposed-tasks/download-upgrade-opsman.yml
     input_mapping:
-      download-config: interpolated-files
+      download-config: configuration
       state: state
       config: configuration
       vars: configuration
