@@ -8,7 +8,7 @@ fi
 
 product=$1
 echo "Generating configuration for product $product"
-versionfile="../config/versions/$product.yml"
+versionfile="../environments/vsphere/dev/config/versions/$product.yml"
 if [ ! -f ${versionfile} ]; then
   echo "Must create ${versionfile}"
   exit 1
@@ -33,17 +33,17 @@ if [ -f ${ops_files} ]; then
   do
     ops_files_args+=("-o ${wrkdir}/${var}")
   done < "$ops_files"
-  bosh int ${wrkdir}/product.yml ${ops_files_args[@]} > ../config/templates/${product}.yml
+  bosh int ${wrkdir}/product.yml ${ops_files_args[@]} > ../environments/vsphere/dev/config/templates/${product}.yml
 fi
 
-rm -rf ../config/defaults/${product}.yml
-touch ../config/defaults/${product}.yml
+rm -rf ../environments/vsphere/dev/config/defaults/${product}.yml
+touch ../environments/vsphere/dev/config/defaults/${product}.yml
 if [ -f ${wrkdir}/product-default-vars.yml ]; then
-  cat ${wrkdir}/product-default-vars.yml >> ../config/defaults/${product}.yml
+  cat ${wrkdir}/product-default-vars.yml >> ../environments/vsphere/dev/config/defaults/${product}.yml
 fi
 if [ -f ${wrkdir}/errand-vars.yml ]; then
-  cat ${wrkdir}/errand-vars.yml >> ../config/defaults/${product}.yml
+  cat ${wrkdir}/errand-vars.yml >> ../environments/vsphere/dev/config/defaults/${product}.yml
 fi
 if [ -f ${wrkdir}/resource-vars.yml ]; then
-  cat ${wrkdir}/resource-vars.yml >> ../config/defaults/${product}.yml
+  cat ${wrkdir}/resource-vars.yml >> ../environments/vsphere/dev/config/defaults/${product}.yml
 fi
