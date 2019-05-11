@@ -6,3 +6,5 @@ network_name: deployment
 opsman/enable/url: opsman.haas-415.pez.pivotal.io
 service_network_name: deployment
 singleton_availability_zone: AZ1
+push-apps_post_deploy_state: off
+smoke-tests_post_deploy_state: off
