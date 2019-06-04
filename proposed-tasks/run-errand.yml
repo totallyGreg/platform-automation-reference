@@ -7,7 +7,7 @@ inputs:
 
 params:
   CONFIG_FILE: product.yml
-  ERRAND_FILE:
+  ERRAND_NAME:
   ENV_FILE: env.yml
   OPSMAN_SSH_PRIVATE_KEY:
   INSTANCE:
@@ -33,11 +33,8 @@ run:
     om --env env/${ENV_FILE} curl -p /api/v0/staged/products  > ${staged_products}
     installation=$(bosh int ${staged_products} --path /type=${product}/installation_name)
 
-    while IFS= read -r errand
-    do
-      if [ -z "$INSTANCE" ]; then
-        bosh -d ${installation} run-errand ${errand}
-      else
-        bosh -d ${installation} run-errand ${errand} --instance ${INSTANCE}
-      fi
-    done < config/"$ERRAND_FILE"
+    if [ -z "$INSTANCE" ]; then
+      bosh -d ${installation} run-errand ${ERRAND_NAME}
+    else
+      bosh -d ${installation} run-errand ${ERRAND_NAME} --instance ${INSTANCE}
+    fi
