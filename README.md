@@ -39,7 +39,7 @@ Used to store opsmanager state.yml file leveraged by create-vm task.  Folder str
 
 * `make-commit` - this task avoids committing state.yml using `porcelain` option, PR has been accepted so this task will be replace with platform-automation task once it's shipped
 
-* `run-errands` - this task will leverage a file in the configuration directory <iaas>/<enviroment>/<config>/<errands>/<product> to determine what errands to run.  The approach here disables all errands from being ran in the apply-changes flow and then will run them directly via bosh to allow parallel running the errand(s) after apply-changes for a given product has succeeded in the pipeline.
+* `run-errand` - The approach here disables all errands from being ran in the apply-changes flow and then will run them directly via bosh to allow running errands after apply-changes for a given product has succeeded in the pipeline while the next tile is being deployed.
 
 ## Scripts
 
