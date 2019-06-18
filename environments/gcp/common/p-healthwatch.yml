@@ -1,0 +1,9 @@
+network_name: services
+service_network_name: services
+
+healthwatch-forwarder_internet_connected: false
+mysql_internet_connected: false
+redis_internet_connected: false
+
+push-apps_post_deploy_state: off
+smoke-tests_post_deploy_state: off

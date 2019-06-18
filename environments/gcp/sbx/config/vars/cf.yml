@@ -1,0 +1,9 @@
+singleton_availability_zone: europe-west4-a
+cloud_controller/system_domain: sys.sbx.cwashburn.pivotal.io
+cloud_controller/apps_domain: apps.sbx.cwashburn.pivotal.io
+az2_name: europe-west4-b
+az3_name: europe-west4-c
+
+
+# configure gcs buckets for file storage
+system_blobstore/external_gcs_service_account/project_id: cwashburn-sbx

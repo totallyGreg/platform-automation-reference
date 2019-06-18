@@ -1,0 +1,4 @@
+---
+gcp_zone: "europe-west2-b"
+opsman_subnet: projects/network-nonprod/regions/europe-west2/subnetworks/infra-nonprd-subnet
+opsman_private_ip: 10.107.16.5

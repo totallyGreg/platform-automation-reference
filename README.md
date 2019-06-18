@@ -21,11 +21,9 @@ Within each iaas/foundation name folder there would be multiple folders
 
 * `versions` - this folder contains both the product version and stemcell version per product. **Promotable**
 
-* `errands` - this folder contains a file with a list of errand names to run per product.  Ideally this would be a proper yaml file but for now easier to read errand names via bash.  Used by `run-errands` task in `proposed-tasks`
-
 ## State
 
-Used to store opsmanager state.yml file leveraged by create-vm task.  Folder structure mimics environment <iaas>/<environment name>
+Used to store opsmanager state.yml file leveraged by create-vm task.  State folder inside environment directory
 
 ## Proposed Tasks
 
@@ -39,18 +37,4 @@ Used to store opsmanager state.yml file leveraged by create-vm task.  Folder str
 
 * `make-commit` - this task avoids committing state.yml using `porcelain` option, PR has been accepted so this task will be replace with platform-automation task once it's shipped
 
-* `run-errand` - The approach here disables all errands from being ran in the apply-changes flow and then will run them directly via bosh to allow running errands after apply-changes for a given product has succeeded in the pipeline while the next tile is being deployed.
-
-## Scripts
-
-This contains 2 scripts.
-* `generate-config.sh <product-name>` - this script uses `om config-template` to generate configuration yaml configuration, defaults, etc applying operations lies in <product>-operations.  Currently places the results in the first enviroment `environents/vsphere/dev/config`
-
-* `validate-config.sh <product-name>` - this script validates that all properties that are needed to interpolate the template in `environents/vsphere/dev/config/templates/<product-name>.yml` This uses vars files from `environents/vsphere/dev/config/defaults/<product-name>.yml`, `environents/vsphere/dev/config/vars/<product-name>.yml`, `environents/vsphere/dev/config/secrets/<product-name>.yml`
-
-
-## TODO
-
-- Expand example to show global defaults (things like `security_acknowledgement: X` in cf.yml)
-- Expand example to have iaas default vars
-- Expand example to have environment type default vars (for situations where there are multiple productions as an example)
+* `run-errand` - this task will run an errand via bosh cli

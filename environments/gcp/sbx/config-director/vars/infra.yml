@@ -1,0 +1,4 @@
+---
+gcp_project: cwashburn-sbx
+gcp_region: eu-w4
+environment_type: sbx

@@ -1,0 +1,5 @@
+singleton_availability_zone: europe-west2-a
+az2_name: europe-west2-b
+az3_name: europe-west2-c
+healthwatch-forwarder/foundation_name: non-prod
+healthwatch-forwarder/health_check_az: europe-west2-a

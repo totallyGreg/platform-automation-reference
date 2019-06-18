@@ -1,0 +1,18 @@
+az1: europe-west2-a
+az2: europe-west2-b
+az3: europe-west2-c
+
+gcp_infra_network: network-nonprod/vpc-nonprod/infra-nonprd-subnet/europe-west2
+gcp_infra_network_cidr: 10.107.16.0/25
+gcp_infra_network_gateway: 10.107.16.1
+gcp_infra_network_reserved_ip_ranges: 10.107.16.0-10.107.16.20
+
+gcp_pas_network: network-nonprod/vpc-nonprod/pas-nonprd-subnet/europe-west2
+gcp_pas_network_cidr: 10.107.0.0/22
+gcp_pas_network_gateway: 10.107.0.1
+gcp_pas_network_reserved_ip_ranges: 10.107.0.0-10.107.0.20
+
+gcp_services_network: network-sbx/vpc-sbx/services-sbx-subnet/europe-west4
+gcp_services_network_cidr: 10.107.4.0/22
+gcp_services_network_gateway: 10.107.4.1
+gcp_services_network_reserved_ip_ranges: 10.107.4.0-10.107.4.20

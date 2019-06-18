@@ -1,0 +1,5 @@
+az2_name: europe-west4-b
+az3_name: europe-west4-c
+healthwatch-forwarder/foundation_name: sbx
+healthwatch-forwarder/health_check_az: europe-west4-a
+singleton_availability_zone: europe-west4-a

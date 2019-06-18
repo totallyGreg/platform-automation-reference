@@ -1,0 +1,4 @@
+---
+gcp_project: cwashburn-nonprod
+gcp_region: eu-w2
+environment_type: nonprod

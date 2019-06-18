@@ -1,0 +1,8 @@
+singleton_availability_zone: europe-west2-a
+cloud_controller/system_domain: sys.non-prod.cwashburn.pivotal.io
+cloud_controller/apps_domain: apps.non-prod.cwashburn.pivotal.io
+az2_name: europe-west2-b
+az3_name: europe-west2-c
+
+# configure gcs buckets for file storage
+system_blobstore/external_gcs_service_account/project_id: cwashburn-nonprod

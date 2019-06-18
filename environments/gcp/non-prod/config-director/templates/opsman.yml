@@ -1,0 +1,14 @@
+---
+opsman-configuration:
+  gcp:
+    gcp_service_account: ((gcp_service_account))
+    project: ((gcp_project))
+    region: ((gcp_region))
+    zone: ((gcp_zone))
+    vm_name: pcf-((gcp_region))-((environment_type))-ops-manager
+    vpc_subnet: ((opsman_subnet))
+    tags: pcf-((gcp_region))-((environment_type)),pcf-((gcp_region))-((environment_type))-opsman,egress-nat-gce,ext-ssh
+    custom_cpu: ((opsman_cpu))
+    custom_memory: ((opsman_memory))
+    boot_disk_size: ((opsman_disk_size))
+    private_ip: ((opsman_private_ip))
