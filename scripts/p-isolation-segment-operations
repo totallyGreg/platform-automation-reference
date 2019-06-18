@@ -1,3 +1,0 @@
-features/haproxy_forward_tls-disable.yml
-network/3-az-configuration.yml
-resource/isolated_router_additional_vm_extensions.yml
