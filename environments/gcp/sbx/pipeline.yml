@@ -110,6 +110,10 @@ jobs:
       passed: ["validate-director-configuration"]
     - get: state
     - get: platform-automation-image
+      resource: platform-automation
+      params:
+        unpack: true
+        globs: ["*image*"]
     - get: platform-automation-tasks
       resource: platform-automation
       params:
@@ -142,9 +146,6 @@ jobs:
         vars/environments/((iaas))/((foundation))/config-director/vars/opsman.yml
         secrets/environments/((iaas))/((foundation))/config-director/secrets/opsman.yml
         secrets/environments/((iaas))/((foundation))/config-director/secrets/pivnet.yml
-
-    tags:
-    - {{foundation}}
 
     ensure: &make-state-commit
       do:
@@ -246,6 +247,10 @@ jobs:
       passed: [ export-installation ]
     - get: state
     - get: platform-automation-image
+      resource: platform-automation
+      params:
+        unpack: true
+        globs: ["*image*"]
     - get: platform-automation-tasks
       resource: platform-automation
       params:
@@ -284,8 +289,6 @@ jobs:
         secrets/environments/((iaas))/((foundation))/config-director/secrets/pivnet.yml
       ENV_FILE: environments/((iaas))/((foundation))/config-director/secrets/env.yml
     ensure: *make-state-commit
-    tags:
-    - {{foundation}}
   - task: apply-director-changes
     image: platform-automation-image
     file: platform-automation-tasks/tasks/apply-director-changes.yml
