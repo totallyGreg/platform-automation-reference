@@ -7,7 +7,7 @@ The structure of this repository allows for multiple environments to be represen
 
 folder holds the configuration for a given deployment where there is a subfolder for a given iaas and environment name.  `IaaS` folder would likely be optional
 
-### Configuration
+### Configuration <iaas>/<foundation_name>/config/
 
 Within each iaas/foundation name folder there would be multiple folders
 
